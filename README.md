@@ -1,4 +1,4 @@
-Iterates through a flutter project 
-to add binding classes for get controllers
-to replace route strings with string constants
+Iterates through a flutter project <br />
+to add binding classes for get controllers  <br />
+to replace route strings with string constants  <br />
 to replace Navigator Named routes with Get routes
