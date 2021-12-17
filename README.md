@@ -1,2 +1,4 @@
-A sample command-line application with an entrypoint in `bin/`, library code
-in `lib/`, and example unit test in `test/`.
+Iterates through a flutter project 
+to add binding classes for get controllers
+to replace route strings with string constants
+to replace Navigator Named routes with Get routes
