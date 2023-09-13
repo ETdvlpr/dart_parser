@@ -4,19 +4,21 @@ import 'dart:io';
 void replaceGetPut(Directory screens) {
   for (var file in screens.listSync(recursive: true)) {
     if (file is File) {
-      String contents = file.readAsStringSync();
-      contents = contents.replaceAllMapped(RegExp(r'Get.put<.*>'), (match) {
-        return 'Get.put';
-      });
-      contents = contents.replaceAllMapped(RegExp(r'Get.put\(.*\)'), (match) {
-        String? replacement = match.group(0);
-        if (replacement == null) return "";
-        replacement = replacement
-            .replaceFirst("Get.put(", "Get.find<")
-            .replaceFirst("())", ">()");
-        return replacement;
-      });
-      file.writeAsStringSync(contents);
+      if (file.path.endsWith('.dart')) {
+        String contents = file.readAsStringSync();
+        contents = contents.replaceAllMapped(RegExp(r'Get.put<.*>'), (match) {
+          return 'Get.put';
+        });
+        contents = contents.replaceAllMapped(RegExp(r'Get.put\(.*\)'), (match) {
+          String? replacement = match.group(0);
+          if (replacement == null) return "";
+          replacement = replacement
+              .replaceFirst("Get.put(", "Get.find<")
+              .replaceFirst("())", ">()");
+          return replacement;
+        });
+        file.writeAsStringSync(contents);
+      }
     }
   }
 }

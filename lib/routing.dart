@@ -11,25 +11,24 @@ void changeNavigationToGet(Directory dir) {
         bool changed = false;
         var content = file.readAsStringSync();
         content = content.replaceAllMapped(
-          RegExp(r'Navigator.pushNamed\((.|\n)*?\)'),
+          RegExp(r'Navigator.push\((.|\n)*?\)'),
           (match) {
             String? replacement = match.group(0);
             if (replacement == null) return "";
             replacement = replacement
-                .replaceFirst("Navigator.pushNamed(", "Get.toNamed(")
+                .replaceFirst("Navigator.push(", "Get.toNamed(")
                 .replaceFirst("context,", "");
             changed = true;
             return replacement;
           },
         );
         content = content.replaceAllMapped(
-          RegExp(r'Navigator.pushReplacementNamed\((.|\n)*?\)'),
+          RegExp(r'Navigator.pushReplacement\((.|\n)*?\)'),
           (match) {
             String? replacement = match.group(0);
             if (replacement == null) return "";
             replacement = replacement
-                .replaceFirst(
-                    "Navigator.pushReplacementNamed(", "Get.offNamed(")
+                .replaceFirst("Navigator.pushReplacement(", "Get.offNamed(")
                 .replaceFirst("context,", "");
             changed = true;
             return replacement;
@@ -93,6 +92,41 @@ void changeRoutes(Directory dir, String routesFilePath, String packageName) {
       }
     }
   }
+}
+
+void createRoutes(Directory dir, String routesFilePath, String packageName) {
+  Map<String, String> routes = {};
+  for (var entity in dir.listSync(recursive: true)) {
+    if (entity is File) {
+      if (entity.path.endsWith('.dart')) {
+        var file = File(entity.path);
+        var content = file.readAsStringSync();
+        content = content.replaceAllMapped(
+          RegExp(r'MaterialPageRoute\((.|\n)*?\)\)'),
+          (match) {
+            String? replacement = match.group(0);
+            if (replacement == null) return "";
+            String route =
+                replacement.substring(replacement.indexOf("=>") + 2).trim();
+            String index = route
+                .replaceAll("const", "")
+                .replaceAll("(", "")
+                .replaceAll(")", "")
+                .trim();
+            routes[index] = route.replaceAll("))", ")");
+            return "'$index'";
+          },
+        );
+        String importPath = "package:$packageName/src/" +
+            routesFilePath.substring(routesFilePath.indexOf("/lib/src") + 8);
+        content = "import '$importPath';\n" + content;
+        entity.writeAsStringSync(content);
+      }
+    }
+  }
+  // for (String x in routes.keys) {
+  //   print(x + " : " + routes[x]!);
+  // }
 }
 
 Map<String, String> getRoutesFromFile(File routeConstants) {
